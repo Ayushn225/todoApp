@@ -9,11 +9,13 @@ import useTheme from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
 import {
 	Alert,
 	FlatList,
 	StatusBar,
 	Text,
+	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
@@ -23,12 +25,16 @@ type todo = Doc<"todos">;
 
 export default function Index() {
 	const { toggleDarkMode, colors } = useTheme();
+	const [editText, setEditText] = useState("");
+	const [editId, setEditId] = useState<Id<"todos"> | null>(null);
 
 	const homeStyle = createHomeStyles(colors);
 
 	const todos = useQuery(api.todos.getTodos);
 
 	const toggleTodo = useMutation(api.todos.toggleTodo);
+	const deleteTodo = useMutation(api.todos.deleteTodo);
+	const updateTodo = useMutation(api.todos.updateTodo);
 
 	const handleTodoToggle = async (id: Id<"todos">) => {
 		try {
@@ -42,7 +48,47 @@ export default function Index() {
 		}
 	};
 
+	const handleDeleteTodo = async (id: Id<"todos">) => {
+		Alert.alert("Delete Todo", "Are you sure you want to delete this todo?", [
+			{
+				text: "Delete",
+				style: "destructive",
+				onPress: async () => {
+					deleteTodo({ id });
+				},
+			},
+			{ text: "Cancel", style: "cancel" },
+		]);
+	};
+
+	const handleEditTodo = (todo: todo) => {
+		setEditId(todo._id);
+		setEditText(todo.text);
+	};
+
+	const handleSaveEdit = async () => {
+		try {
+			if (editId) {
+				await updateTodo({ id: editId, text: editText });
+				setEditId(null);
+				setEditText("");
+			}
+		} catch (error) {
+			console.error("Error updating todo:", error);
+			Alert.alert(
+				"Error",
+				"There was an error updating the todo item. Please try again."
+			);
+		}
+	};
+
+	const handleCancelEdit = () => {
+		setEditId(null);
+		setEditText("");
+	};
+
 	const renderTodoList = ({ item }: { item: todo }) => {
+		const isEditing = editId === item._id;
 		return (
 			<View style={homeStyle.todoItemWrapper}>
 				<LinearGradient
@@ -75,6 +121,35 @@ export default function Index() {
 						</LinearGradient>
 					</TouchableOpacity>
 
+					{(isEditing)? (
+						<View style={homeStyle.editContainer}>
+							<TextInput 
+								style = {homeStyle.editInput}
+								value={editText}
+								onChangeText={setEditText}
+								autoFocus
+								multiline
+								placeholder="Edit todo..."
+								placeholderTextColor={colors.textMuted}
+								
+							/>
+							<View style={homeStyle.editButtons}>
+								<TouchableOpacity activeOpacity = {0.8} onPress={handleSaveEdit}>
+									<LinearGradient colors={colors.gradients.success} style={homeStyle.editButton}>
+										<Ionicons name={"checkmark"} size={24} color = "#fff" />
+										<Text style={homeStyle.editButtonText}>Save</Text>
+									</LinearGradient>
+								</TouchableOpacity>
+
+								<TouchableOpacity activeOpacity = {0.8} onPress={handleCancelEdit}>
+									<LinearGradient colors={colors.gradients.muted} style={homeStyle.editButton}>
+										<Ionicons name={"close"} size={24} color = "#fff" />
+										<Text style={homeStyle.editButtonText}>Cancel</Text>
+									</LinearGradient>
+								</TouchableOpacity>
+							</View>
+						</View>
+					): (
 					<View style={homeStyle.todoTextContainer}>
 						<Text
 							style={[
@@ -90,7 +165,12 @@ export default function Index() {
 						</Text>
 
 						<View style={homeStyle.todoActions}>
-							<TouchableOpacity activeOpacity={0.8}>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={() => {
+									handleEditTodo(item);
+								}}
+							>
 								<LinearGradient
 									colors={colors.gradients.warning}
 									style={homeStyle.actionButton}
@@ -99,7 +179,10 @@ export default function Index() {
 								</LinearGradient>
 							</TouchableOpacity>
 
-							<TouchableOpacity activeOpacity={0.8}>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={() => handleDeleteTodo(item._id)}
+							>
 								<LinearGradient
 									colors={colors.gradients.danger}
 									style={homeStyle.actionButton}
@@ -109,6 +192,7 @@ export default function Index() {
 							</TouchableOpacity>
 						</View>
 					</View>
+					)}
 				</LinearGradient>
 			</View>
 		);
