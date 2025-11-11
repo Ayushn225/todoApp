@@ -121,77 +121,85 @@ export default function Index() {
 						</LinearGradient>
 					</TouchableOpacity>
 
-					{(isEditing)? (
+					{isEditing ? (
 						<View style={homeStyle.editContainer}>
-							<TextInput 
-								style = {homeStyle.editInput}
+							<TextInput
+								style={homeStyle.editInput}
 								value={editText}
 								onChangeText={setEditText}
 								autoFocus
 								multiline
 								placeholder="Edit todo..."
 								placeholderTextColor={colors.textMuted}
-								
 							/>
 							<View style={homeStyle.editButtons}>
-								<TouchableOpacity activeOpacity = {0.8} onPress={handleSaveEdit}>
-									<LinearGradient colors={colors.gradients.success} style={homeStyle.editButton}>
-										<Ionicons name={"checkmark"} size={24} color = "#fff" />
+								<TouchableOpacity activeOpacity={0.8} onPress={handleSaveEdit}>
+									<LinearGradient
+										colors={colors.gradients.success}
+										style={homeStyle.editButton}
+									>
+										<Ionicons name={"checkmark"} size={24} color="#fff" />
 										<Text style={homeStyle.editButtonText}>Save</Text>
 									</LinearGradient>
 								</TouchableOpacity>
 
-								<TouchableOpacity activeOpacity = {0.8} onPress={handleCancelEdit}>
-									<LinearGradient colors={colors.gradients.muted} style={homeStyle.editButton}>
-										<Ionicons name={"close"} size={24} color = "#fff" />
+								<TouchableOpacity
+									activeOpacity={0.8}
+									onPress={handleCancelEdit}
+								>
+									<LinearGradient
+										colors={colors.gradients.muted}
+										style={homeStyle.editButton}
+									>
+										<Ionicons name={"close"} size={24} color="#fff" />
 										<Text style={homeStyle.editButtonText}>Cancel</Text>
 									</LinearGradient>
 								</TouchableOpacity>
 							</View>
 						</View>
-					): (
-					<View style={homeStyle.todoTextContainer}>
-						<Text
-							style={[
-								homeStyle.todoText,
-								item.isCompleted && {
-									textDecorationLine: "line-through",
-									color: colors.textMuted,
-									opacity: 0.4,
-								},
-							]}
-						>
-							{item.text}
-						</Text>
-
-						<View style={homeStyle.todoActions}>
-							<TouchableOpacity
-								activeOpacity={0.8}
-								onPress={() => {
-									handleEditTodo(item);
-								}}
+					) : (
+						<View style={homeStyle.todoTextContainer}>
+							<Text
+								style={[
+									homeStyle.todoText,
+									item.isCompleted && {
+										textDecorationLine: "line-through",
+										color: colors.textMuted,
+										opacity: 0.4,
+									},
+								]}
 							>
-								<LinearGradient
-									colors={colors.gradients.warning}
-									style={homeStyle.actionButton}
-								>
-									<Ionicons name="pencil" size={20} color="#ffffff" />
-								</LinearGradient>
-							</TouchableOpacity>
+								{item.text}
+							</Text>
 
-							<TouchableOpacity
-								activeOpacity={0.8}
-								onPress={() => handleDeleteTodo(item._id)}
-							>
-								<LinearGradient
-									colors={colors.gradients.danger}
-									style={homeStyle.actionButton}
+							<View style={homeStyle.todoActions}>
+								<TouchableOpacity
+									activeOpacity={0.8}
+									onPress={() => {
+										handleEditTodo(item);
+									}}
 								>
-									<Ionicons name="trash" size={20} color="#ffffff" />
-								</LinearGradient>
-							</TouchableOpacity>
+									<LinearGradient
+										colors={colors.gradients.warning}
+										style={homeStyle.actionButton}
+									>
+										<Ionicons name="pencil" size={20} color="#ffffff" />
+									</LinearGradient>
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									activeOpacity={0.8}
+									onPress={() => handleDeleteTodo(item._id)}
+								>
+									<LinearGradient
+										colors={colors.gradients.danger}
+										style={homeStyle.actionButton}
+									>
+										<Ionicons name="trash" size={20} color="#ffffff" />
+									</LinearGradient>
+								</TouchableOpacity>
+							</View>
 						</View>
-					</View>
 					)}
 				</LinearGradient>
 			</View>
@@ -222,21 +230,6 @@ export default function Index() {
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={<EmptyList />}
 				/>
-
-				<TouchableOpacity
-					onPress={toggleDarkMode}
-					style={{
-						backgroundColor: "lightgray",
-						margin: 4,
-						width: 200,
-						height: 50,
-						alignItems: "center",
-						justifyContent: "center",
-						borderRadius: 10,
-					}}
-				>
-					<Text>Toggle Dark Mode</Text>
-				</TouchableOpacity>
 			</SafeAreaView>
 		</LinearGradient>
 	);
